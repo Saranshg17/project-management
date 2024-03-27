@@ -1,17 +1,13 @@
 import mongoose,{Schema} from "mongoose";
 
-const TaskSchema = new Schema({
-    Name:{
+const HistorySchema = new Schema({
+    TaskId:{
         type: String,
         required: true,
         index:true
     },
-    Description: {
-        type: String,
-        required: true
-    },
-    Status: {
-        type: String,    // Complete, In Progress, Done
+    TaskUpdate: {
+        type: [String],    // Status change "prev to current"
         required: true
     },
     Assigned_to: {
@@ -22,13 +18,9 @@ const TaskSchema = new Schema({
         type: String,   //ID of Employee who assigned task
         required: true
     },
-    Category:{
-        type: String,   // HR, Finance, IT, Resourcing
-        required: true
-    }
 },
 {
     timestamps: true
 })
 
-export const tasks = mongoose.model("tasks",TaskSchema)
+export const history = mongoose.model("history",HistorySchema)
