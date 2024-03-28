@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { users } from "../models/user.model.js";
 import { tasks } from "../models/task.model.js";
-import { history } from "../models/history.model.js";
+import { histories } from "../models/history.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -205,7 +205,7 @@ const AddTask = asyncHandler(async(req,res)=>{
         }
     )
 
-    const his = await history.create({
+    const his = await histories.create({
         TaskId: task._id,
         TaskUpdate: "New task created",
         Assigned_to: Assignee_id,
@@ -213,16 +213,153 @@ const AddTask = asyncHandler(async(req,res)=>{
     })
 
     return res.status(201).json(
-        new ApiResponse(200,task,"Task assigned successfully")
+        new ApiResponse(201,task,"Task assigned successfully")
     )
 
 
 })
 
+const updateTask = asyncHandler(async(req,res)=>{
+    const {taskId,StatusChange,AssigneeChange} = req.body
+
+    if(
+        [taskId].some((field)=>field?.trim()==="")
+    ){
+        throw new ApiError(400, "Task Id is required.")
+    }
+
+    const task_=await tasks.findById(taskId)
+
+    if(!task_){
+        throw new ApiError(400,"No such task exists.")
+    }
+
+    let TaskId=taskId
+    const his = await histories.findOne({ TaskId })
+
+    console.log(his)
+
+    let update_ = his.TaskUpdate
+
+    let a=0
+    let b=0
+
+    if(req.user.Role==="Standard User"){
+        if(AssigneeChange!=="" && AssigneeChange){
+            throw new ApiError(404, "You are not authorized to change assignee")
+        }
+
+        if(StatusChange==="" || !StatusChange){
+            throw new ApiError(400,"There isn't any change")
+        }
+
+        await tasks.findByIdAndUpdate(taskId,
+            {
+                $set: {
+                    Status: StatusChange
+                }
+            },
+            {
+                new: true
+            }
+        )
+
+        update_.push(`Status changed by assignee to ${StatusChange}`)
+
+        await histories.findByIdAndUpdate(his._id,
+            {
+                $set: {
+                    TaskUpdate: update_
+                }
+            },
+            {
+                new: true
+            }
+        )
+
+        return res.status(201).json(
+            new ApiResponse(201,{},"Task updated successfully")
+        )
+    }
+
+    if(AssigneeChange===""){
+        AssigneeChange=task_.Assigned_to
+        a=1
+    }
+    if(StatusChange===""){
+        StatusChange=task_.Status
+        b=1
+    }
+
+    if(a===1 && b===1){
+        throw new ApiError(400, "There isn't any change")
+    }
+
+    await tasks.findByIdAndUpdate(taskId,
+        {
+            $set: {
+                Status: StatusChange,
+                Assigned_to: AssigneeChange
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    if(a===1){
+        update_.push(`Status changed by admin to ${StatusChange}`)
+
+        await histories.findByIdAndUpdate(his._id,
+            {
+                $set: {
+                    TaskUpdate: update_
+                }
+            },
+            {
+                new: true
+            }
+        )
+    }
+    if(b==1){
+        update_.push(`Assignee changed by admin to ${AssigneeChange}`)
+
+        await histories.findByIdAndUpdate(his._id,
+            {
+                $set: {
+                    TaskUpdate: update_
+                }
+            },
+            {
+                new: true
+            }
+        )
+    }
+    update_.push(`Status and Assignee changed by admin to ${StatusChange} and ${AssigneeChange} respectively`)
+
+    await histories.findByIdAndUpdate(his._id,
+        {
+            $set: {
+                TaskUpdate: update_
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+
+    return res.status(201).json(
+        new ApiResponse(201,{},"Task updated successfully")
+    )
+
+
+})
 
 export {
     logoutUser,
     loginUser,
     registerUser,
-    AddTask
+    AddTask,
+    updateTask
 }
