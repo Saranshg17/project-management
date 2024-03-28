@@ -237,8 +237,6 @@ const updateTask = asyncHandler(async(req,res)=>{
     let TaskId=taskId
     const his = await histories.findOne({ TaskId })
 
-    console.log(his)
-
     let update_ = his.TaskUpdate
 
     let a=0
@@ -356,10 +354,85 @@ const updateTask = asyncHandler(async(req,res)=>{
 
 })
 
+const deleteTask = asyncHandler(async(req,res)=>{
+    const {TaskId} = req.body
+
+    if(
+        [TaskId].some((field)=>field?.trim()==="")
+    ){
+        throw new ApiError(400, "Task Id is required.")
+    }
+
+    const task_=await tasks.findById(TaskId)
+
+    if(!task_){
+        throw new ApiError(400,"No such task exists.")
+    }
+
+    if(req.user.Role==="Standard User"){
+        throw new ApiError(401,"You are not authorized to delete task")
+    }
+
+    const his = await histories.findOne({ TaskId })
+
+    let update_ = his.TaskUpdate
+
+    update_.push("Task deleted by admin")
+
+    let tasks_ = req.user.tasks
+
+    for(let i=0;i<tasks_.length;i++){
+        if(tasks_[i]===TaskId){
+            tasks_.splice(i, 1);
+        }
+    }
+
+    try {
+        await users.findByIdAndUpdate(task_.Assigned_to,
+            {
+                $set: {
+                    tasks: tasks_
+                }
+            },
+            {
+                new: true
+            }
+        )
+        
+        tasks.deleteOne({_id:TaskId})
+        .then(()=>{
+            return res.status(201).json(
+                new ApiResponse(200,{},"Task deleted successfully")
+            )
+        })
+        .catch((err)=>{
+            throw new ApiError(400,"Task doesn't exist")
+        })
+
+        await histories.findByIdAndUpdate(his._id,
+            {
+                $set: {
+                    TaskUpdate: update_
+                }
+            },
+            {
+                new: true
+            }
+        )
+
+        
+
+    } catch (error) {
+        throw new ApiError(401,error)
+    }
+
+})
+
 export {
     logoutUser,
     loginUser,
     registerUser,
     AddTask,
-    updateTask
+    updateTask,
+    deleteTask
 }
