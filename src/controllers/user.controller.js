@@ -161,9 +161,68 @@ const logoutUser = asyncHandler(async(req,res)=>{
     .json(new ApiResponse(200, {},"User logged out"))
 })
 
+const AddTask = asyncHandler(async(req,res)=>{
+    if(req.user.Role==="Standard User"){
+        throw new ApiError(404 ,"You don't have access to create tasks")
+    }
+
+    const {name,description,Assignee_id,category} = req.body  
+
+    if(
+        [name,description,Assignee_id,category].some((field)=>field?.trim()==="")
+    ){
+        throw new ApiError(400, "Some required fields are empty")
+    }
+
+    const assignee = await users.findById(Assignee_id);
+
+    if(!assignee){
+        throw new ApiError(404, "Assignee not found")
+    }
+
+    const task = await tasks.create({
+        Name: name,
+        Description: description,
+        Status: "Started",
+        Assigned_to: Assignee_id,
+        Assigned_by: req.user._id,
+        Category: category
+        // categories: categories || ""
+    })
+
+    let task_ = assignee.tasks;
+
+    task_.push(task._id)
+
+    await users.findByIdAndUpdate(Assignee_id,
+        {
+            $set: {
+                tasks:task_
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    const his = await history.create({
+        TaskId: task._id,
+        TaskUpdate: "New task created",
+        Assigned_to: Assignee_id,
+        Assigned_by: req.user._id
+    })
+
+    return res.status(201).json(
+        new ApiResponse(200,task,"Task assigned successfully")
+    )
+
+
+})
+
 
 export {
     logoutUser,
     loginUser,
-    registerUser
+    registerUser,
+    AddTask
 }
