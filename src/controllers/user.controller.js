@@ -428,11 +428,37 @@ const deleteTask = asyncHandler(async(req,res)=>{
 
 })
 
+const gethistory = asyncHandler(async(req,res)=>{
+    const {TaskId} = req.body
+
+    if(
+        [TaskId].some((field)=>field?.trim()==="")
+    ){
+        throw new ApiError(400, "Task Id is required.")
+    }
+
+    const his = await histories.findOne({ TaskId })
+
+    if(req.user._id!=his.Assigned_to && req.user._id!=his.Assigned_by){
+        throw new ApiError(500,"You don't have access to this.")
+    }
+
+    if(!his){
+        throw new ApiError(404, `History associated to Task Id ${TaskId} is not found`)
+    }
+
+    res.send(his)
+
+    return res.status(200)
+
+})
+
 export {
     logoutUser,
     loginUser,
     registerUser,
     AddTask,
     updateTask,
-    deleteTask
+    deleteTask,
+    gethistory
 }
