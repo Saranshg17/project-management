@@ -24,7 +24,6 @@ const generateAccessandRefreshToken = async(userId) => {
     }
 }
 
-
 const registerUser = asyncHandler(async (req,res) => {
     //get user details from frontend
     const {email,password,role}=req.body
@@ -159,6 +158,40 @@ const logoutUser = asyncHandler(async(req,res)=>{
     .clearCookie("accessToken",options)
     .clearCookie("refreshToken",options)
     .json(new ApiResponse(200, {},"User logged out"))
+})
+
+const deleteUser = asyncHandler(async(req,res)=>{
+    const {userId} = req.body
+
+    if(
+        [userId].some((field)=>field?.trim()==="")
+    ){
+        throw new ApiError(400, "User Id is required.")
+    }
+
+    const user_=await users.findById(userId)
+
+    if(!user_){
+        throw new ApiError(400,"No such user exists.")
+    }
+
+    if(req.user.Role==="Standard User"){
+        throw new ApiError(401,"You are not authorized to delete user")
+    }
+
+    try {
+        users.deleteOne({_id:userId})
+        .then(()=>{
+            return res.status(201).json(
+                new ApiResponse(200,{},"User deleted successfully")
+            )
+        })
+        .catch((err)=>{
+            throw new ApiError(400,"Task doesn't exist")
+        })
+    } catch (error) {
+        throw new ApiError(401,error)
+    }
 })
 
 const AddTask = asyncHandler(async(req,res)=>{
@@ -439,7 +472,7 @@ const gethistory = asyncHandler(async(req,res)=>{
 
     const his = await histories.findOne({ TaskId })
 
-    if(req.user._id!=his.Assigned_to && req.user._id!=his.Assigned_by){
+    if(req.user._id!==his.Assigned_to && req.user._id!==his.Assigned_by){
         throw new ApiError(500,"You don't have access to this.")
     }
 
@@ -453,6 +486,28 @@ const gethistory = asyncHandler(async(req,res)=>{
 
 })
 
+const getAllTasks = asyncHandler(async(req,res)=>{
+    if(req.user!=="Standard User"){
+        const Assigned_to=req.user._id
+        const result = await tasks.find({ Assigned_to })
+        if(!result){
+            throw new ApiError(404,"No tasks associated to you found")
+        }
+        res.json(result)
+        return res.status(200)
+    }
+    const Assigned_by=req.user._id
+    console.log(Assigned_by)
+    const result = await tasks.find({ Assigned_by })
+    if(!result){
+        throw new ApiError(404,"No tasks associated to you found")
+    }
+    console.log(result)
+    res.json(result)
+    return res.status(200)    
+
+})
+
 export {
     logoutUser,
     loginUser,
@@ -460,5 +515,7 @@ export {
     AddTask,
     updateTask,
     deleteTask,
-    gethistory
+    gethistory,
+    getAllTasks,
+    deleteUser
 }

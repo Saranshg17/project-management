@@ -25,6 +25,9 @@ const TaskSchema = new Schema({
     Category:{
         type: String,   // HR, Finance, IT, Resourcing
         required: true
+    },
+    Comment:{
+        type: String
     }
 },
 {
