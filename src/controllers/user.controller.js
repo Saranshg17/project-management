@@ -253,7 +253,7 @@ const AddTask = asyncHandler(async(req,res)=>{
 })
 
 const updateTask = asyncHandler(async(req,res)=>{
-    const {taskId,StatusChange,AssigneeChange} = req.body
+    const {taskId,StatusChange,AssigneeChange,Comment} = req.body
 
     if(
         [taskId].some((field)=>field?.trim()==="")
@@ -287,7 +287,8 @@ const updateTask = asyncHandler(async(req,res)=>{
         await tasks.findByIdAndUpdate(taskId,
             {
                 $set: {
-                    Status: StatusChange
+                    Status: StatusChange,
+                    Comment: Comment
                 }
             },
             {
@@ -295,7 +296,7 @@ const updateTask = asyncHandler(async(req,res)=>{
             }
         )
 
-        update_.push(`Status changed by assignee to ${StatusChange}`)
+        update_.push(`Status changed by assignee to ${StatusChange} with Comment ${Comment}`)
 
         await histories.findByIdAndUpdate(his._id,
             {
@@ -330,7 +331,8 @@ const updateTask = asyncHandler(async(req,res)=>{
         {
             $set: {
                 Status: StatusChange,
-                Assigned_to: AssigneeChange
+                Assigned_to: AssigneeChange,
+                Comment: Comment
             }
         },
         {
@@ -339,7 +341,7 @@ const updateTask = asyncHandler(async(req,res)=>{
     )
 
     if(a===1){
-        update_.push(`Status changed by admin to ${StatusChange}`)
+        update_.push(`Status changed by admin to ${StatusChange} with Comment ${Comment}`)
 
         await histories.findByIdAndUpdate(his._id,
             {
@@ -366,7 +368,7 @@ const updateTask = asyncHandler(async(req,res)=>{
             }
         )
     }
-    update_.push(`Status and Assignee changed by admin to ${StatusChange} and ${AssigneeChange} respectively`)
+    update_.push(`Status and Assignee changed by admin to ${StatusChange} and ${AssigneeChange} respectively with Comment ${Comment}`)
 
     await histories.findByIdAndUpdate(his._id,
         {
@@ -472,7 +474,7 @@ const gethistory = asyncHandler(async(req,res)=>{
 
     const his = await histories.findOne({ TaskId })
 
-    if(req.user._id!==his.Assigned_to && req.user._id!==his.Assigned_by){
+    if(req.user._id!=his.Assigned_to && req.user._id!=his.Assigned_by){
         throw new ApiError(500,"You don't have access to this.")
     }
 
