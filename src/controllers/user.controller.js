@@ -199,7 +199,7 @@ const AddTask = asyncHandler(async(req,res)=>{
         throw new ApiError(404 ,"You don't have access to create tasks")
     }
 
-    const {name,description,Assignee_id,category} = req.body  
+    const {name,description,Assignee_id,category,custom} = req.body  
 
     if(
         [name,description,Assignee_id,category].some((field)=>field?.trim()==="")
@@ -219,7 +219,8 @@ const AddTask = asyncHandler(async(req,res)=>{
         Status: "Started",
         Assigned_to: Assignee_id,
         Assigned_by: req.user._id,
-        Category: category
+        Category: category,
+        Custom: custom
         // categories: categories || ""
     })
 

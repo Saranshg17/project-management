@@ -1,5 +1,17 @@
 import mongoose,{Schema} from "mongoose";
 
+
+const KeyValueSchema = new Schema({
+    key: {
+        type: String,
+        required: true
+    },
+    value: {
+        type: Schema.Types.Mixed, // Allows any type of value
+        required: true
+    }
+})
+
 const TaskSchema = new Schema({
     Name:{
         type: String,
@@ -28,6 +40,9 @@ const TaskSchema = new Schema({
     },
     Comment:{
         type: String
+    },
+    Custom: {
+        type: [KeyValueSchema]
     }
 },
 {
