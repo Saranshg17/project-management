@@ -4,7 +4,6 @@ import { users } from "../models/user.model.js";
 import { tasks } from "../models/task.model.js";
 import { histories } from "../models/history.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import jwt from "jsonwebtoken";
 
 
 
@@ -511,6 +510,122 @@ const getAllTasks = asyncHandler(async(req,res)=>{
 
 })
 
+const AddCustom = asyncHandler(async(req,res)=>{
+    const {CustomKeyValue,taskId} = req.body
+
+    if(
+        [taskId].some((field)=>field?.trim()==="")
+    ){
+        throw new ApiError(400, "Task id is required")
+    }
+
+    const task_ = await tasks.findById(taskId)
+
+    if(req.user._id!=task_.Assigned_to && req.user._id!=task_.Assigned_by){
+        throw new ApiError(401,"You are not authorised to add custom section to this api")
+    }
+
+    let custom_ = task_.Custom;
+
+    custom_.push(CustomKeyValue)
+
+    await tasks.findByIdAndUpdate(taskId,
+        {
+            $set: {
+                Custom:custom_
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    let TaskId = taskId
+
+    const his = await histories.findOne({TaskId})
+
+    let update = his.TaskUpdate;
+
+    update.push(`New custom section added by ${req.user._id}: ${CustomKeyValue}`)
+        
+    await histories.findByIdAndUpdate(his._id,
+        {
+            $set: {
+                TaskUpdate:update
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+
+    return res.status(200).json(
+        new ApiResponse(200,"Custom section added successfully")
+    )
+
+    
+})
+
+const UpdateCustom = asyncHandler(async(req,res)=>{
+    const {key_,taskId,value} = req.body
+
+    if(
+        [key_,taskId, value].some((field)=>field?.trim()==="")
+    ){
+        throw new ApiError(400, "Some required values are empty")
+    }
+
+    const task_ = await tasks.findById(taskId)
+
+    if(req.user._id!=task_.Assigned_to && req.user._id!=task_.Assigned_by){
+        throw new ApiError(401,"You are not authorised to add custom section to this api")
+    }
+
+    let custom_ = task_.Custom;
+
+    for(let i=0;i<custom_.length;i++){
+        if(custom_[i]["key"]==key_){
+            custom_[i]["value"]=value
+        }
+    }
+
+    await tasks.findByIdAndUpdate(taskId,
+        {
+            $set: {
+                Custom:custom_
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    let TaskId = taskId
+
+    const his = await histories.findOne({TaskId})
+
+    let update = his.TaskUpdate;
+
+    update.push(`Custom section's value with key ${key_} is updated by ${req.user._id} to ${value}`)
+        
+    await histories.findByIdAndUpdate(his._id,
+        {
+            $set: {
+                TaskUpdate:update
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    return res.status(200).json(
+        new ApiResponse(200,"Custom section updated successfully")
+    )
+
+})
+
 export {
     logoutUser,
     loginUser,
@@ -520,5 +635,7 @@ export {
     deleteTask,
     gethistory,
     getAllTasks,
-    deleteUser
+    deleteUser,
+    AddCustom,
+    UpdateCustom
 }
