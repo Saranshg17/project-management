@@ -17,6 +17,7 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
     width: 300px;
+    text-align: center;
   }
   
   h2 {
@@ -30,12 +31,14 @@ body {
   }
   
   input[type='email'],
+  input[type='role'],
   input[type='password'] {
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
   }
+  
   
   button {
     padding: 10px;
@@ -48,5 +51,16 @@ body {
   
   button:hover {
     background-color: #0056b3;
+  }
+  
+  .link-text {
+    margin-top: 20px; /* Add some space between the button and the text */
+    font-size: 14px;
+    color: #007bff; /* Set the text color to blue to indicate a link */
+    cursor: pointer;
+  }
+  
+  .link-text:hover {
+    text-decoration: underline; /* Underline the text on hover to indicate it's clickable */
   }
   

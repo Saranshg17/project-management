@@ -1,5 +1,6 @@
 // LoginPage.js
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './styles.css';
 
 const LoginPage = () => {
@@ -31,8 +32,10 @@ const LoginPage = () => {
         />
         <button type="submit">Login</button>
       </form>
+      <p>If you don't have an account, <Link to="/signup">click here</Link> to register.</p>
     </div>
   );
 };
 
 export default LoginPage;
+
