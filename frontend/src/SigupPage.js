@@ -23,6 +23,7 @@ const SignupPage = () => {
       setPasswordMatchError('');
       setRegistrationError('');
       // Redirect user to login page or show success message
+      window.location.href = '/login';
     } catch (error) {
       console.error('Registration failed:', error.response.data);
       setRegistrationError('Registration failed. Please try again.'); // Display error message to user
