@@ -1,6 +1,7 @@
 // LoginPage.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import './styles.css';
 
 const LoginPage = () => {
@@ -8,8 +9,28 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // Your login logic here
-    console.log('Logging in with:', loginData);
+    try {
+      const response = await axios.post('http://localhost:8000/api/v1/users/login', loginData);
+      // Assuming the API returns both tokens upon successful login
+      const { refreshToken, sessionToken } = response.data;
+      // Store the tokens in cookies
+      setCookie('refreshToken', refreshToken, 10);
+      setCookie('sessionToken', sessionToken, 1);
+      alert("Successfully Logged in")
+      // Redirect to a different page
+      // window.location.href = '/dashboard'; // Redirect to dashboard after login
+    } catch (error) {
+      console.error('Login failed:', error.response.data);
+      // Handle login error
+    }
+  };
+
+  // Function to set cookie
+  const setCookie = (name, value, days) => {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = 'expires=' + date.toUTCString();
+    document.cookie = name + '=' + value + ';' + expires + ';path=/';
   };
 
   return (
