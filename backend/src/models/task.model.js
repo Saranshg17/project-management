@@ -34,7 +34,7 @@ const TaskSchema = new Schema({
         type: String,   //ID of Employee who assigned task
         required: true
     },
-    Category:{
+    Project:{
         type: String,   // HR, Finance, IT, Resourcing
         required: true
     },

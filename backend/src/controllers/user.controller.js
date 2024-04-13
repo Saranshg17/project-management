@@ -4,6 +4,7 @@ import { users } from "../models/user.model.js";
 import { tasks } from "../models/task.model.js";
 import { histories } from "../models/history.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { projects } from "../models/project.model.js";
 
 
 
@@ -198,10 +199,10 @@ const AddTask = asyncHandler(async(req,res)=>{
         throw new ApiError(404 ,"You don't have access to create tasks")
     }
 
-    const {name,description,Assignee_id,category,custom} = req.body  
+    const {name,description,Assignee_id,Project,custom} = req.body  
 
     if(
-        [name,description,Assignee_id,category].some((field)=>field?.trim()==="")
+        [name,description,Assignee_id,Project].some((field)=>field?.trim()==="")
     ){
         throw new ApiError(400, "Some required fields are empty")
     }
@@ -218,7 +219,7 @@ const AddTask = asyncHandler(async(req,res)=>{
         Status: "Started",
         Assigned_to: Assignee_id,
         Assigned_by: req.user._id,
-        Category: category,
+        Project: Project,
         Custom: custom
         // categories: categories || ""
     })
@@ -244,6 +245,23 @@ const AddTask = asyncHandler(async(req,res)=>{
         Assigned_to: Assignee_id,
         Assigned_by: req.user._id
     })
+
+    const Name = Project;
+    const proj = await projects.findOne({ Name })
+
+    const tasks__=proj.Tasks
+    tasks__.push(task._id)
+
+    await projects.findByIdAndUpdate(proj._id,
+        {
+            $set: {
+                Tasks:tasks__
+            }
+        },
+        {
+            new: true
+        }
+    )
 
     return res.status(201).json(
         new ApiResponse(201,task,"Task assigned successfully")
@@ -626,6 +644,26 @@ const UpdateCustom = asyncHandler(async(req,res)=>{
 
 })
 
+const AddProject = asyncHandler(async(req,res)=>{
+    const {Name,Description} = req.body
+
+    if(
+        [Name,Description].some((field)=>field?.trim()==="")
+    ){
+        throw new ApiError(400, "Some required values are empty")
+    }
+    const project = await projects.create({
+        Name: Name,
+        Description: Description,
+        Tasks: []
+    })
+
+    return res.status(201).json(
+        new ApiResponse(201,project,"Project created successfully")
+    )
+
+})
+
 export {
     logoutUser,
     loginUser,
@@ -637,5 +675,6 @@ export {
     getAllTasks,
     deleteUser,
     AddCustom,
-    UpdateCustom
+    UpdateCustom,
+    AddProject
 }
