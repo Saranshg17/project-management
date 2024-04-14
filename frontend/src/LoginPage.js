@@ -6,7 +6,6 @@ import './styles.css';
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -17,6 +16,7 @@ const LoginPage = () => {
       setCookie('refreshToken', refreshToken, 10);
       setCookie('sessionToken', sessionToken, 1);
       alert("Successfully Logged in")
+      window.location.href = '/dashboard';
       // Redirect to a different page
       // window.location.href = '/dashboard'; // Redirect to dashboard after login
     } catch (error) {
