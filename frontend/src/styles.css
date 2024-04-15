@@ -74,7 +74,7 @@ button:hover {
 .tabs-container {
   display: flex; /* Use flexbox layout */
   width: 100%; /* Take full width of parent container */
-  margin-bottom: 650px;
+  margin-bottom: 20px;
   padding: 0; /* Remove default padding */
 }
 

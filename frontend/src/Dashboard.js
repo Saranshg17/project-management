@@ -1,53 +1,54 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
 const Dashboard = ({ userRole }) => {
   const [activeTab, setActiveTab] = useState('projects');
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
 
-  // Function to fetch tasks from the backend
+  useEffect(() => {
+    if (activeTab === 'projects') {
+      fetchProjects();
+    } else if (activeTab === 'tasks') {
+      fetchTasks();
+    }
+  }, [activeTab]);
+
   const fetchTasks = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/users/getall');
-      const data = await response.json();
-      console.log(data)
-      setTasks(data); // Assuming data is an array of tasks fetched from the backend
+      const response = await axios.get('http://localhost:8000/api/v1/users/getall', {
+        headers: {
+          "authorization": window.localStorage.getItem("accessToken")
+        }
+      });
+      const data = response.data;
+      setTasks(data); 
     } catch (error) {
-      alert(`This section failed to load with error:${error}`)
       console.error('Error fetching tasks:', error);
     }
   };
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/users/getproject'); // Assuming the backend endpoint is '/api/projects'
-      const data = await response.json();
-      setProjects(data); // Set the fetched projects in state
+      const response = await axios.get('http://localhost:8000/api/v1/users/getproject', {
+        headers: {
+          "authorization": window.localStorage.getItem("accessToken")
+        }
+      });
+      const data = response.data;
+      setProjects(data); 
     } catch (error) {
-      alert(`This section failed to load with error:${error}`)
       console.error('Error fetching projects:', error);
     }
   };
 
-  // Function to handle tab change
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    if (tab === 'tasks') {
-      fetchTasks(); // Fetch tasks when the 'Tasks' tab is activated
-    }
-    if(tab === 'projects') {
-      fetchProjects();
-    }
-  };
-
-  const ProjectCard = ({ projectName, projectId, projectDescription }) => (
-    <div className="project-card">
-      <h3>{projectName}</h3>
-      <p>{projectId}</p>
-      <p>{projectDescription}</p>
-    </div>
-  );
-
+  // const ProjectCard = ({ projectName, projectId, projectDescription }) => (
+  //   <div className="project-card" style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
+  //     <h3>{projectName}</h3>
+  //     <p>{projectId}</p>
+  //     <p>{projectDescription}</p>
+  //   </div>
+  // );
 
   return (
     <div>
@@ -55,13 +56,13 @@ const Dashboard = ({ userRole }) => {
       <div className="tabs-container">
         <div
           className={activeTab === 'projects' ? 'tab-box active' : 'tab-box'}
-          onClick={() => handleTabChange('projects')}
+          onClick={() => setActiveTab('projects')}
         >
           <h3>Projects</h3>
         </div>
         <div
           className={activeTab === 'tasks' ? 'tab-box active' : 'tab-box'}
-          onClick={() => handleTabChange('tasks')}
+          onClick={() => setActiveTab('tasks')}
         >
           <h3>Tasks</h3>
         </div>
@@ -69,46 +70,33 @@ const Dashboard = ({ userRole }) => {
       <div style={{ marginTop: '20px' }}>
         {activeTab === 'projects' && (
           <div>
-            {/* Projects section */}
-            <h3>Projects Section (Only visible to Admin)</h3>
             {projects.map(project => (
-              <ProjectCard
-                key={project._id} // Assuming each project has a unique identifier like _id
-                projectName={project.name}
-                projectId={project.id}
-                projectDescription={project.description}
-              />
+              <div key={project.id} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
+                <h3>{project.Name}</h3>
+                <p>Id: {project._id}</p>
+                <p>Description: {project.Description}</p>
+              <button style={{ marginRight: '10px' }}>Add Task</button>
+            </div>
              ))}
           </div>
         )}
         {activeTab === 'tasks' && (
           <div>
-            {/* Tasks section */}
-            <h3>Tasks Section (Visible to Admin and Standard User)</h3>
-            {/* Render list of tasks */}
-            {tasks.map((task) => (
-              <div key={task.id} className="task">
-                <div className="task-header">
-                  <h3>{task.Name}</h3>
-                  <p>{task._id}</p>
-                </div>
-                <div className="task-body">
-                  <p>{task.Description}</p>
-                  <p>Project: {task.projectName}</p>
-                  <p>Key: {task.key}</p>
-                </div>
-                <div className="task-footer">
-                  <select>
-                    <option value="started">Started</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="done">Done</option>
-                  </select>
-                  <button>History</button>
-                  <div className="action-buttons">
-                    <button className="update-assignee">Update Assignee</button>
-                    <button className="add-custom">Add Custom</button>
-                  </div>
-                </div>
+            {tasks.map(task => (
+              <div key={task.id} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
+                <h3>{task.Name}</h3>
+                <p>Id: {task._id}</p>
+                <p>Description: {task.Description}</p>
+                <p>Project: {task.Project}</p>
+                <p>Key: {task.key}</p>
+                <select style={{ marginRight: '10px' }}>
+                  <option value="started">Started</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+                <button style={{ marginRight: '10px' }}>History</button>
+                <button style={{ marginRight: '10px' }}>Update Assignee</button>
+                <button>Add Custom</button>
               </div>
             ))}
           </div>

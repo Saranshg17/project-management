@@ -10,28 +10,18 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8000/api/v1/users/login', loginData);
-      // Assuming the API returns both tokens upon successful login
-      const { refreshToken, sessionToken } = response.data;
+      const refreshToken = response.data.data.refreshToken;
+      const accessToken = response.data.data.accessToken;
       // Store the tokens in cookies
-      setCookie('refreshToken', refreshToken, 10);
-      setCookie('sessionToken', sessionToken, 1);
+      window.localStorage.setItem('refreshToken', refreshToken, 10);
+      window.localStorage.setItem('accessToken', accessToken, 1);
       alert("Successfully Logged in")
       window.location.href = '/dashboard';
-      // Redirect to a different page
-      // window.location.href = '/dashboard'; // Redirect to dashboard after login
     } catch (error) {
       alert(`Login failed with error: ${error.response.data}`)
       console.error('Login failed:', error.response.data);
       // Handle login error
     }
-  };
-
-  // Function to set cookie
-  const setCookie = (name, value, days) => {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    const expires = 'expires=' + date.toUTCString();
-    document.cookie = name + '=' + value + ';' + expires + ';path=/';
   };
 
   return (
