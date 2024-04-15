@@ -69,3 +69,29 @@ button:hover {
 .link-text:hover {
   text-decoration: underline; /* Underline the text on hover to indicate it's clickable */
 }
+
+/* Container for tabs */
+.tabs-container {
+  display: flex; /* Use flexbox layout */
+  width: 100%; /* Take full width of parent container */
+  margin-bottom: 650px;
+  padding: 0; /* Remove default padding */
+}
+
+/* Tab boxes */
+.tab-box {
+  flex-grow: 1; /* Expand to fill the available space */
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+.tab-box.active {
+  background-color: #007bff;
+  color: #fff;
+}

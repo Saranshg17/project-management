@@ -507,7 +507,9 @@ const gethistory = asyncHandler(async(req,res)=>{
 })
 
 const getAllTasks = asyncHandler(async(req,res)=>{
-    if(req.user!=="Standard User"){
+    // console.log(req.user,req.user._id)
+    if(req.user.Role=="Standard User"){
+        console.log("Standard user")
         const Assigned_to=req.user._id
         const result = await tasks.find({ Assigned_to })
         if(!result){
@@ -517,12 +519,10 @@ const getAllTasks = asyncHandler(async(req,res)=>{
         return res.status(200)
     }
     const Assigned_by=req.user._id
-    console.log(Assigned_by)
     const result = await tasks.find({ Assigned_by })
     if(!result){
         throw new ApiError(404,"No tasks associated to you found")
     }
-    console.log(result)
     res.json(result)
     return res.status(200)    
 
@@ -664,6 +664,18 @@ const AddProject = asyncHandler(async(req,res)=>{
 
 })
 
+const getProjects = asyncHandler(async(req,res)=>{
+    if(req.user.Role=="Standard User"){
+        throw new ApiError(401,"You are not authorised to access this section")
+    }
+    const result = await projects.find();
+    if(!result){
+        throw new ApiError(404,"No Projects found")
+    }
+    res.json(result)
+    return res.status(200)
+})
+
 export {
     logoutUser,
     loginUser,
@@ -676,5 +688,6 @@ export {
     deleteUser,
     AddCustom,
     UpdateCustom,
-    AddProject
+    AddProject,
+    getProjects
 }

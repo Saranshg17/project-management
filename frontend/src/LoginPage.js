@@ -20,6 +20,7 @@ const LoginPage = () => {
       // Redirect to a different page
       // window.location.href = '/dashboard'; // Redirect to dashboard after login
     } catch (error) {
+      alert(`Login failed with error: ${error.response.data}`)
       console.error('Login failed:', error.response.data);
       // Handle login error
     }

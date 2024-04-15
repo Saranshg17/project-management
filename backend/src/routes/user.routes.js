@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser,loginUser,logoutUser, AddTask, updateTask, deleteTask, gethistory, getAllTasks, deleteUser, AddCustom, UpdateCustom, AddProject } from "../controllers/user.controller.js";
+import { registerUser,loginUser,logoutUser, AddTask, updateTask, deleteTask, gethistory, getAllTasks, deleteUser, AddCustom, UpdateCustom, AddProject, getProjects } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 
@@ -19,5 +19,6 @@ router.route("/getall").get(verifyJWT,getAllTasks)
 router.route("/deleteuser").delete(verifyJWT,deleteUser)
 router.route("/addcustom").put(verifyJWT,AddCustom)
 router.route("/updatecustom").put(verifyJWT,UpdateCustom)
+router.route("/getproject").get(verifyJWT,getProjects)
 
 export default router
