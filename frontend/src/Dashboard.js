@@ -42,17 +42,17 @@ const Dashboard = ({ userRole }) => {
     }
   };
 
-  // const ProjectCard = ({ projectName, projectId, projectDescription }) => (
-  //   <div className="project-card" style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
-  //     <h3>{projectName}</h3>
-  //     <p>{projectId}</p>
-  //     <p>{projectDescription}</p>
-  //   </div>
-  // );
-
   return (
     <div>
       <h2>Dashboard</h2>
+      {/* <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+        <li class="nav-item" role="presentation">
+        <button class="nav-link active rounded-5" id="tasks-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">Tasks</button>
+        </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-5" id="projects-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Projects</button>
+        </li>
+      </ul> */}
       <div className="tabs-container">
         <div
           className={activeTab === 'projects' ? 'tab-box active' : 'tab-box'}
