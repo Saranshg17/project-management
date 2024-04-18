@@ -4,11 +4,11 @@ import mongoose,{Schema} from "mongoose";
 const KeyValueSchema = new Schema({
     key: {
         type: String,
-        required: true
+        // required: true
     },
     value: {
         type: Schema.Types.Mixed, // Allows any type of value
-        required: true
+        // required: true
     }
 })
 

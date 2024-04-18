@@ -1,10 +1,12 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import AddTaskPopup from './AddTaskPopup';
 
 const Dashboard = ({ userRole }) => {
   const [activeTab, setActiveTab] = useState('projects');
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [showAddTaskPopup, setShowAddTaskPopup] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'projects') {
@@ -13,6 +15,36 @@ const Dashboard = ({ userRole }) => {
       fetchTasks();
     }
   }, [activeTab]);
+
+  const handleAddTask = (formData) => {
+    // Send API request to add task using formData
+    try {
+      const response = axios.post('http://localhost:8000/api/v1/users/task', formData,{
+        headers: {
+          "authorization": window.localStorage.getItem("accessToken")
+        }
+      });
+      console.log('Task added successfully:', response.data);
+      fetchTasks(); 
+    } catch (error) {
+      alert(`Error adding task: ${error}`)
+      console.error('Error adding task:', error);
+    }
+    // const response = axios.post('http://localhost:8000/api/v1/users/task',formData,{
+    //   headers: {
+    //     "authorization": window.localStorage.getItem("accessToken")
+    //   }
+    // })
+    //   .then(response => {
+    //     // Handle success
+    //     console.log('Task added successfully:', response.data);
+    //     fetchTasks(); // Refresh tasks after adding a new one
+    //   })
+    //   .catch(error => {
+    //     alert(`Error adding task: ${error}`)
+    //     console.error('Error adding task:', error);
+    //   });
+  };
 
   const fetchTasks = async () => {
     try {
@@ -75,9 +107,15 @@ const Dashboard = ({ userRole }) => {
                 <h3>{project.Name}</h3>
                 <p>Id: {project._id}</p>
                 <p>Description: {project.Description}</p>
-              <button style={{ marginRight: '10px' }}>Add Task</button>
+              <button style={{ marginRight: '10px' }} onClick={() => setShowAddTaskPopup(true)}>Add Task</button>
             </div>
              ))}
+             {showAddTaskPopup && (
+        <AddTaskPopup
+          onClose={() => setShowAddTaskPopup(false)}
+          onSubmit={handleAddTask}
+        />
+      )}
           </div>
         )}
         {activeTab === 'tasks' && (
