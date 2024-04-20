@@ -482,15 +482,15 @@ const deleteTask = asyncHandler(async(req,res)=>{
 })
 
 const gethistory = asyncHandler(async(req,res)=>{
-    const {TaskId} = req.body
+    const TaskId = req.query.TaskId
+    // console.log(req.query.TaskId)
+    // console.log(TaskId)
+    if (!TaskId || TaskId.trim() == "") {
+        throw new ApiError(400, "Task Id is required.");
+      }
+    const his = await histories.findOne({ "TaskId" :TaskId })
 
-    if(
-        [TaskId].some((field)=>field?.trim()==="")
-    ){
-        throw new ApiError(400, "Task Id is required.")
-    }
-
-    const his = await histories.findOne({ TaskId })
+    // console.log(his)
 
     if(req.user._id!=his.Assigned_to && req.user._id!=his.Assigned_by){
         throw new ApiError(500,"You don't have access to this.")

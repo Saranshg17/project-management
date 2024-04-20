@@ -1,12 +1,14 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import AddTaskPopup from './AddTaskPopup';
+// import AddCustomPopup from './AddCustomPopup';
 
 const Dashboard = ({ userRole }) => {
   const [activeTab, setActiveTab] = useState('projects');
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [showAddTaskPopup, setShowAddTaskPopup] = useState(false);
+  // const [showAddCustomPopup, setShowAddCustomPopup] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'projects') {
@@ -30,21 +32,39 @@ const Dashboard = ({ userRole }) => {
       alert(`Error adding task: ${error}`)
       console.error('Error adding task:', error);
     }
-    // const response = axios.post('http://localhost:8000/api/v1/users/task',formData,{
-    //   headers: {
-    //     "authorization": window.localStorage.getItem("accessToken")
-    //   }
-    // })
-    //   .then(response => {
-    //     // Handle success
-    //     console.log('Task added successfully:', response.data);
-    //     fetchTasks(); // Refresh tasks after adding a new one
-    //   })
-    //   .catch(error => {
-    //     alert(`Error adding task: ${error}`)
-    //     console.error('Error adding task:', error);
-    //   });
   };
+  
+  const getHistory = async (TaskId) => {
+    // alert(`${window.localStorage.getItem("accessToken")},${TaskId}`)
+    try {
+      const response = await axios.get('http://localhost:8000/api/v1/users/history',{
+        params : {"TaskId":TaskId},
+        headers: {
+          "authorization": window.localStorage.getItem("accessToken")
+        }
+      });
+      console.log(response)
+      alert(`${response.data.TaskUpdate}\nLast updated at: ${response.data.updatedAt}`)
+    } catch (error) {
+      alert(`Error getting history: ${error}`)
+    }
+  }
+
+  // const handleAddCustom = (formData) => {
+  //   // Send API request to add task using formData
+  //   try {
+  //     const response = axios.post('http://localhost:8000/api/v1/users/task', formData,{
+  //       headers: {
+  //         "authorization": window.localStorage.getItem("accessToken")
+  //       }
+  //     });
+  //     console.log('Task added successfully:', response.data);
+  //     fetchTasks(); 
+  //   } catch (error) {
+  //     alert(`Error adding task: ${error}`)
+  //     console.error('Error adding task:', error);
+  //   }
+  // };
 
   const fetchTasks = async () => {
     try {
@@ -132,11 +152,18 @@ const Dashboard = ({ userRole }) => {
                   <option value="in-progress">In Progress</option>
                   <option value="done">Done</option>
                 </select>
-                <button style={{ marginRight: '10px' }}>History</button>
+                <button style={{ marginRight: '10px' }} onClick={() => getHistory(task._id)}>History</button>
                 <button style={{ marginRight: '10px' }}>Update Assignee</button>
                 <button>Add Custom</button>
+                {/* <button onClick={() => setShowAddCustomPopup(true)}>Add Custom</button> */}
               </div>
             ))}
+            {/* {showAddCustomPopup && (
+            <AddTaskPopup
+              onClose={() => setShowAddCustomPopup(false)}
+              onSubmit={handleAddCustom}
+            />
+            )} */}
           </div>
         )}
       </div>

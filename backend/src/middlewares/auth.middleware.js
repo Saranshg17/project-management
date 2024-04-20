@@ -9,6 +9,7 @@ export const verifyJWT = asyncHandler(async(req,_,
     next)=>{
 
         try {
+            // console.log(req.header)
             const token = req.header("authorization")?.replace("Bearer ","")
             // console.log(token)
             if(!token){
@@ -17,7 +18,7 @@ export const verifyJWT = asyncHandler(async(req,_,
             const decodedToken= jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
     
             const user = await users.findById(decodedToken?._id).select("-password -refreshToken")
-    
+            // console.log(user)
             if(!user){
                 throw new ApiError(401, "Invalid Access Token")
             }
@@ -29,3 +30,6 @@ export const verifyJWT = asyncHandler(async(req,_,
         }
         
     })
+
+
+    
