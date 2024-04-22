@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import AddTaskPopup from './AddTaskPopup';
+import deleteIcon from './delete-icon.png';
 
 const Dashboard = ({ userRole }) => {
   const [activeTab, setActiveTab] = useState('projects');
@@ -75,12 +76,13 @@ const Dashboard = ({ userRole }) => {
     const newStatus = event.target.value;
     const updatedTasks = tasks.map(task => {
       if (task._id === TaskId) {
-        return { ...task, status: newStatus };
+        return { ...task, Status: newStatus };
       }
       return task;
     });
     setTasks(updatedTasks);
     updateTaskStatus(TaskId, newStatus);
+    // fetchTasks();
   };
 
   const updateTaskStatus = async (taskId, newStatus) => {
@@ -110,6 +112,27 @@ const Dashboard = ({ userRole }) => {
     } catch (error) {
       alert(error)
       console.error('Error logging out:', error);
+    }
+  };
+
+  const handleDelete = async(taskId) => {
+    // Perform deletion logic here (e.g., send delete request to server)
+    // For demonstration, let's filter out the task with the given ID
+    const accessToken = window.localStorage.getItem("accessToken");
+    const TaskId = taskId
+    try{
+      const response = await axios.delete('http://localhost:8000/api/v1/users/delete',
+        { 
+          data:{TaskId},
+          headers: { "authorization": `Bearer ${accessToken}` }
+        }
+      );
+      console.log("Task Deleted successfully")
+      const updatedTasks = tasks.filter(task => task._id !== taskId);
+      setTasks(updatedTasks);
+    }catch(error) {
+      alert(error)
+      console.error('Error deleting task:',error)
     }
   };
 
@@ -167,6 +190,9 @@ const Dashboard = ({ userRole }) => {
                   </select>
                   <button style={{ marginRight: '10px' }} onClick={() => getHistory(task._id)}>History</button>
                   <button style={{ marginRight: '10px' }}>Update Assignee</button>
+                  <button onClick={() => handleDelete(task._id)} className="delete-button">
+                    <img src={deleteIcon} alt="Delete" /> {/* Use your delete icon image */}
+                  </button>
                   {/* <button>Add Custom</button> */}
                 </div>
               ))}

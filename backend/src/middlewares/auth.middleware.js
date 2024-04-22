@@ -9,7 +9,7 @@ export const verifyJWT = asyncHandler(async(req,_,
     next)=>{
 
         try {
-            console.log(req.header)
+            // console.log(req.header)
             const token = req.header("authorization")?.replace("Bearer ","")
             console.log(token)
             if(!token){
