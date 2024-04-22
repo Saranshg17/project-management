@@ -36,7 +36,7 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="container"> {/* Add a container class for styling */}
+    <div className="container1"> {/* Add a container class for styling */}
       <h2>Signup</h2>
       <form onSubmit={handleSignup}>
         <input

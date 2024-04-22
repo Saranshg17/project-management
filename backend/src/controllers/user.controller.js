@@ -298,7 +298,7 @@ const updateTask = asyncHandler(async(req,res)=>{
             throw new ApiError(404, "You are not authorized to change assignee")
         }
 
-        if(StatusChange==="" || !StatusChange){
+        if(StatusChange==="" || !StatusChange || StatusChange==undefined){
             throw new ApiError(400,"There isn't any change")
         }
 
@@ -332,11 +332,11 @@ const updateTask = asyncHandler(async(req,res)=>{
         )
     }
 
-    if(AssigneeChange===""){
+    if(AssigneeChange===""||AssigneeChange==undefined){
         AssigneeChange=task_.Assigned_to
         a=1
     }
-    if(StatusChange===""){
+    if(StatusChange===""||StatusChange==undefined){
         StatusChange=task_.Status
         b=1
     }

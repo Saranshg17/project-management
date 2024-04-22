@@ -1,4 +1,3 @@
-// LoginPage.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -25,7 +24,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container1"> {/* Use container1 class */}
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input
@@ -50,4 +49,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
