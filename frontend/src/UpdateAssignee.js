@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
-const AddCustomPopup = ({ onClose, onSubmit }) => {
+const UpdateAssignee = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
-    key: '',
-    value: ''
+    AssigneeChange:'',
+    Comment:'',
+    taskId:''
   });
 
   const handleChange = (e) => {
@@ -23,12 +24,14 @@ const AddCustomPopup = ({ onClose, onSubmit }) => {
     <div className="popup">
       <div className="popup-content">
         <button className="close-button" onClick={onClose}>X</button>
-        <h2>Add Custom</h2>
+        <h2>Update Assignee</h2>
         <form onSubmit={handleSubmit}>
-          <label>Key:</label>
-          <input type="text" name="key" value={formData.key} onChange={handleChange} required />
-          <label>Value:</label>
-          <input type="text" name="value" value={formData.value} onChange={handleChange} required />
+          <label>Assignee id:</label>
+          <input type="text" name="AssigneeChange" value={formData.name} onChange={handleChange} required />
+          <label>Task id:</label>
+          <input type="text" name="taskId" value={formData.name} onChange={handleChange} required />
+          <label>Comment</label>
+          <input type="text" name="Comment" value={formData.description} onChange={handleChange}/>
           <button type="submit">Submit</button>
         </form>
       </div>
@@ -36,4 +39,4 @@ const AddCustomPopup = ({ onClose, onSubmit }) => {
   );
 };
 
-export default AddTaskPopup;
+export default UpdateAssignee;

@@ -1,9 +1,13 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
   margin: 0;
   padding: 0;
-  display: flex; /* Add display flex to body */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  background-image: url('background.jpeg'); /* Add background image */
+  background-size: cover; /* Ensure the image covers the entire background */
+  background-position: center;
 }
 
 .sidebar {
@@ -37,8 +41,9 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  width: 300px;
+  width: 100%;
   text-align: center;
+  align-items: center;
 }
 
 .card {
@@ -81,18 +86,20 @@ body {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 20px;
+  align-items: center;
 }
 
 .container1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #fff;
+  justify-content: center;
+  background-color: rgb(239, 234, 223);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  width: 100%;
-  margin: 0 auto; /* Center horizontally */
+  width: 300px;
+  margin: auto; /* Center horizontally */
   text-align: center;
   overflow-x: auto;
 }
@@ -121,6 +128,7 @@ h2 {
 form {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 input[type='email'],

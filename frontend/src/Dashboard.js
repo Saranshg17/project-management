@@ -2,12 +2,14 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import AddTaskPopup from './AddTaskPopup';
 import deleteIcon from './delete-icon.png';
+import UpdateAssignee from './UpdateAssignee';
 
 const Dashboard = ({ userRole }) => {
   const [activeTab, setActiveTab] = useState('projects');
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [showAddTaskPopup, setShowAddTaskPopup] = useState(false);
+  const [showUpdateAssignee, setShowUpdateAssignee] = useState(false);
   
   useEffect(() => {
     if (activeTab === 'projects') {
@@ -30,6 +32,21 @@ const Dashboard = ({ userRole }) => {
       console.error('Error adding task:', error);
     }
   };
+
+  const handleUpdateAssignee = async (formData) => {
+    try {
+      const response = await axios.put('http://localhost:8000/api/v1/users/update', formData, {
+        headers: {
+          "authorization": window.localStorage.getItem("accessToken")
+        }
+      });
+      console.log('Assignee updated successfully:', response.data);
+      fetchTasks(); 
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
+  };
+  
   
   const getHistory = async (TaskId) => {
     try {
@@ -136,72 +153,6 @@ const Dashboard = ({ userRole }) => {
     }
   };
 
-  // return (
-  //   <div className="dashboard">
-  //     {/* <Sidebar setActiveTab={setActiveTab} logout={handleLogout} /> */}
-  //     <div className="main-content">
-  //       <div className="tabs-container">
-  //         <div
-  //           className={activeTab === 'projects' ? 'tab-box active' : 'tab-box'}
-  //           onClick={() => setActiveTab('projects')}
-  //         >
-  //           <h3>Projects</h3>
-  //         </div>
-  //         <div
-  //           className={activeTab === 'tasks' ? 'tab-box active' : 'tab-box'}
-  //           onClick={() => setActiveTab('tasks')}
-  //         >
-  //           <h3>Tasks</h3>
-  //         </div>
-  //         <button onClick={()=> handleLogout()}>Logout</button>
-  //       </div>
-  //       <div style={{ marginTop: '20px' }}>
-  //         {activeTab === 'projects' && (
-  //           <div>
-  //             {projects.map(project => (
-  //               <div key={project.id} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
-  //                 <h3>{project.Name}</h3>
-  //                 <p>Id: {project._id}</p>
-  //                 <p>Description: {project.Description}</p>
-  //                 <button style={{ marginRight: '10px' }} onClick={() => setShowAddTaskPopup(true)}>Add Task</button>
-  //               </div>
-  //             ))}
-  //             {showAddTaskPopup && (
-  //               <AddTaskPopup
-  //                 onClose={() => setShowAddTaskPopup(false)}
-  //                 onSubmit={handleAddTask}
-  //               />
-  //             )}
-  //           </div>
-  //         )}
-  //         {activeTab === 'tasks' && (
-  //           <div>
-  //             {tasks.map(task => (
-  //               <div key={task.id} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
-  //                 <h3>{task.Name}</h3>
-  //                 <p>Id: {task._id}</p>
-  //                 <p>Description: {task.Description}</p>
-  //                 <p>Project: {task.Project}</p>
-  //                 {/* <p>Key: {task.key}</p> */}
-  //                 <select value={task.Status} onChange={(event) => handleStatusChange(event, task._id)}>
-  //                   <option value="Started">Started</option>
-  //                   <option value="In Progress">In Progress</option>
-  //                   <option value="Done">Done</option>
-  //                 </select>
-  //                 <button style={{ marginRight: '10px' }} onClick={() => getHistory(task._id)}>History</button>
-  //                 <button style={{ marginRight: '10px' }}>Update Assignee</button>
-  //                 <button onClick={() => handleDelete(task._id)} className="delete-button">
-  //                   <img src={deleteIcon} alt="Delete" /> {/* Use your delete icon image */}
-  //                 </button>
-  //                 {/* <button>Add Custom</button> */}
-  //               </div>
-  //             ))}
-  //           </div>
-  //         )}
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
   return (
     <div className="dashboard">
       <div className="main-content">
@@ -279,7 +230,8 @@ const Dashboard = ({ userRole }) => {
                     </td>
                     <td>
                       <button onClick={() => getHistory(task._id)}>History</button>
-                      <button>Update Assignee</button>
+                      {/* <button onClick={() => handleAssigneeUpdate(task._id)}>Update Assignee</button> */}
+                      <button onClick={() => setShowUpdateAssignee(true)}>Update Assignee</button>
                       <button onClick={() => handleDelete(task._id)} className="delete-button">
                         <img src={deleteIcon} alt="Delete" />
                       </button>
@@ -291,6 +243,19 @@ const Dashboard = ({ userRole }) => {
           )}
         </div>
       </div>
+      {showUpdateAssignee && (
+        <UpdateAssignee
+          onClose={() => setShowUpdateAssignee(false)}
+          onSubmit={handleUpdateAssignee}
+        />
+      )}
+      {/* {showCommentPopup && (
+        <CommentPopup
+          onClose={() => setShowCommentPopup(false)}
+          onSubmit={handleCommentSubmit}
+        />
+      )}*/
+    }
     </div>
   );
 };
